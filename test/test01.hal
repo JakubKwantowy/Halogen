@@ -1,7 +1,8 @@
 # test file #
 
-0 1 2 3 4 5 (
-    print
+5 (
+    dup print
+    1 swap -
 )
 
 10 putc
