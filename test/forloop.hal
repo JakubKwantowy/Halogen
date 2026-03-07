@@ -1,0 +1,10 @@
+# For loop #
+
+0 1 (
+    pop
+    dup print
+    1 +
+    dup 5 >
+)
+
+10 putc

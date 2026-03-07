@@ -88,8 +88,22 @@ TOKEN_t *Tokenizer_parse(char *src) {
     char *src_ptr = src;
     char tokenBuffer[STDSTRLEN];
     while(*src_ptr) {
+        int strflag = 0;
         size_t buf_idx = 0;
         while(!Tokenizer_iswhitespace(*src_ptr)) {
+            if(*src_ptr == '"') {
+                buf_idx = 0;
+                src_ptr++;
+                while(*src_ptr != '"') {
+                    if(buf_idx == STDSTRLEN - 1) break;
+                    tokenBuffer[buf_idx] = *src_ptr;
+                    buf_idx++;
+                    src_ptr++;
+                }
+                src_ptr++;
+                strflag = 1;
+                break;
+            }
             if(buf_idx == STDSTRLEN - 1) break;
             tokenBuffer[buf_idx] = *src_ptr;
             buf_idx++;
@@ -97,6 +111,10 @@ TOKEN_t *Tokenizer_parse(char *src) {
         }
         if(buf_idx) {
             tokenBuffer[buf_idx] = 0;
+            if(strflag) {
+                Tokenizer_enqueueString(&toklist, TOKEN_STRING, tokenBuffer);
+                continue;
+            }
             switch (tokenBuffer[0]) {
                 case ':':
                     Tokenizer_enqueueWord(&toklist, TOKEN_REDEF, tokenBuffer+1);
