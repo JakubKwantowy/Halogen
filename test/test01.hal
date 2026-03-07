@@ -1,8 +1,6 @@
 # test file #
 
-5 (
-    dup print
-    1 swap -
+0 10 "Hello World!" 
+(
+    putc
 )
-
-10 putc

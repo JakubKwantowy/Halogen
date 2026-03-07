@@ -1,6 +1,7 @@
 #include <vm.h>
 
 #include <stdio.h>
+#include <string.h>
 #include <dictionary.h>
 
 int VM_Init(VM_t *vm) {
@@ -27,6 +28,14 @@ int VM_Process(VM_t *vm, TOKEN_t *toklist, WORD_t *dict) {
             case TOKEN_NUMBER:
                 Stack_Push(&vm->stack, ((struct Token_Numeric *) token)->value);
             break;
+
+            case TOKEN_STRING: {
+                char *s = ((struct Token_String *) token)->value;
+                size_t l = strlen(s);
+                for(char *p = s + l - 1; p >= s; p--) {
+                    Stack_Push(&vm->stack, *p);
+                }
+            } break;
 
             case TOKEN_WORD: {
                 INT_t hash = ((struct Token_Word *) token)->value;
@@ -90,6 +99,10 @@ int VM_Process(VM_t *vm, TOKEN_t *toklist, WORD_t *dict) {
 
             case TOKEN_CONDITIONAL_END: {
                 TOKEN_t *t = (TOKEN_t *) Stack_Pop(&vm->substack);
+                if(t == NULL) {
+                    VM_error(") without preceeding (");
+                    return 1;
+                }
 
                 INT_t v = (INT_t) Stack_Pop(&vm->stack);
                 Stack_Push(&vm->stack, v);
@@ -103,7 +116,7 @@ int VM_Process(VM_t *vm, TOKEN_t *toklist, WORD_t *dict) {
             case TOKEN_COMMENT: {
                 do {
                     token = token->next;
-                } while(token->type != TOKEN_COMMENT);
+                } while(token->type != TOKEN_COMMENT && token->next != NULL);
             } break;
 
             default:

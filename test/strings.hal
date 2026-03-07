@@ -1,0 +1,12 @@
+# Basic strings #
+
+:puts
+    # C-like puts function #
+
+    ( putc )
+    10 putc
+;
+
+0 "Strings are pushed with the first character on top."
+
+puts
