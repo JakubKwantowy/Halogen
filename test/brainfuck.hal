@@ -1,0 +1,57 @@
+# Halogen brainfuck interpreter (yes it's real) #
+
+0
+
+# Code goes here. #
+
+"++++++++ ++++++++ ++++++++ ++++++++ ++++++++ - . > . < ."
+
+0 0 poke
+1 1 poke
+
+:getbfptr
+    0 peek
+    1 peek
+    8 swap << |
+;
+
+:setbfptr
+    dup 0 swap poke
+    8 swap >> 1 swap poke
+;
+
+:bf_print
+    getbfptr peek putc
+;
+
+:bf_add
+    getbfptr dup peek
+    1 + poke
+;
+
+:bf_sub
+    getbfptr dup peek
+    1 swap - poke
+;
+
+:bf_next
+    getbfptr
+    1 + setbfptr
+;
+
+:bf_prev
+    1 getbfptr
+    - setbfptr
+;
+
+(
+    dup "." = ( pop bf_print 0 ) pop
+    dup "+" = ( pop bf_add 0 ) pop
+    dup "-" = ( pop bf_sub 0 ) pop
+    dup ">" = ( pop bf_next 0 ) pop
+    dup "<" = ( pop bf_prev 0 ) pop
+
+    pop
+)
+
+10 putc

@@ -1,6 +1,6 @@
 # test file #
 
-0 10 "Hello World!" 
-(
-    putc
-)
+10 10 -a
+print print print print
+
+10 putc

@@ -4,6 +4,10 @@
 #include <vm.h>
 #include <stack.h>
 
+static inline INT_t tobool(INT_t v) {
+    return (v ? ~0 : 0);
+}
+
 int Halogen_print(VM_t *vm) {
     INT_t n = (INT_t) Stack_Pop(&vm->stack);
     printf("%d ", n);
@@ -96,7 +100,7 @@ int Halogen_mod(VM_t *vm) {
 int Halogen_bool(VM_t *vm) {
     INT_t v1 = (INT_t) Stack_Pop(&vm->stack);
     
-    Stack_Push(&vm->stack, (v1 ? 1 : 0));
+    Stack_Push(&vm->stack, tobool(v1));
 
     return 0;
 }
@@ -136,11 +140,29 @@ int Halogen_not(VM_t *vm) {
     return 0;
 }
 
+int Halogen_shiftleft(VM_t *vm) {
+    INT_t v1 = (INT_t) Stack_Pop(&vm->stack);
+    INT_t v2 = (INT_t) Stack_Pop(&vm->stack);
+    
+    Stack_Push(&vm->stack, (INT_t) (v1 << v2));
+
+    return 0;
+}
+
+int Halogen_shiftright(VM_t *vm) {
+    INT_t v1 = (INT_t) Stack_Pop(&vm->stack);
+    INT_t v2 = (INT_t) Stack_Pop(&vm->stack);
+    
+    Stack_Push(&vm->stack, (INT_t) (v1 >> v2));
+
+    return 0;
+}
+
 int Halogen_eq(VM_t *vm) {
     INT_t v1 = (INT_t) Stack_Pop(&vm->stack);
     INT_t v2 = (INT_t) Stack_Pop(&vm->stack);
     
-    Stack_Push(&vm->stack, v1 == v2);
+    Stack_Push(&vm->stack, tobool(v1 == v2));
 
     return 0;
 }
@@ -149,7 +171,7 @@ int Halogen_gt(VM_t *vm) {
     INT_t v1 = (INT_t) Stack_Pop(&vm->stack);
     INT_t v2 = (INT_t) Stack_Pop(&vm->stack);
     
-    Stack_Push(&vm->stack, v1 > v2);
+    Stack_Push(&vm->stack, tobool(v1 > v2));
 
     return 0;
 }
@@ -158,7 +180,7 @@ int Halogen_lt(VM_t *vm) {
     INT_t v1 = (INT_t) Stack_Pop(&vm->stack);
     INT_t v2 = (INT_t) Stack_Pop(&vm->stack);
     
-    Stack_Push(&vm->stack, v1 < v2);
+    Stack_Push(&vm->stack, tobool(v1 < v2));
 
     return 0;
 }
@@ -167,7 +189,7 @@ int Halogen_gteq(VM_t *vm) {
     INT_t v1 = (INT_t) Stack_Pop(&vm->stack);
     INT_t v2 = (INT_t) Stack_Pop(&vm->stack);
     
-    Stack_Push(&vm->stack, v1 >= v2);
+    Stack_Push(&vm->stack, tobool(v1 >= v2));
 
     return 0;
 }
@@ -176,7 +198,25 @@ int Halogen_lteq(VM_t *vm) {
     INT_t v1 = (INT_t) Stack_Pop(&vm->stack);
     INT_t v2 = (INT_t) Stack_Pop(&vm->stack);
     
-    Stack_Push(&vm->stack, v1 <= v2);
+    Stack_Push(&vm->stack, tobool(v1 <= v2));
+
+    return 0;
+}
+
+int Halogen_poke(VM_t *vm) {
+    INT_t v1 = (INT_t) Stack_Pop(&vm->stack);
+    INT_t v2 = (INT_t) Stack_Pop(&vm->stack);
+    
+    vm->pokemem[v2 & (POKEMEM_SIZE - 1)] = (uint8_t) v1; // If you're changing POKEMEM_SIZE, change it to [v2 % POKEMEM_SIZE] if POKEMEM_SIZE is not a power of 2
+
+    return 0;
+}
+
+int Halogen_peek(VM_t *vm) {
+    INT_t v1 = (INT_t) Stack_Pop(&vm->stack);
+    
+    INT_t v = (INT_t) vm->pokemem[v1 & (POKEMEM_SIZE - 1)]; // If you're changing POKEMEM_SIZE, change it to [v1 % POKEMEM_SIZE] if POKEMEM_SIZE is not a power of 2
+    Stack_Push(&vm->stack, v);
 
     return 0;
 }
@@ -201,12 +241,17 @@ WORD_t *createDefaultDict() {
     Dictionary_enqueueInternalWord(&dict, "|", (WORD_INTERNAL_t *) &Halogen_or);
     Dictionary_enqueueInternalWord(&dict, "^", (WORD_INTERNAL_t *) &Halogen_xor);
     Dictionary_enqueueInternalWord(&dict, "~", (WORD_INTERNAL_t *) &Halogen_not);
+    Dictionary_enqueueInternalWord(&dict, "<<", (WORD_INTERNAL_t *) &Halogen_shiftleft);
+    Dictionary_enqueueInternalWord(&dict, ">>", (WORD_INTERNAL_t *) &Halogen_shiftright);
 
     Dictionary_enqueueInternalWord(&dict, "=", (WORD_INTERNAL_t *) &Halogen_eq);
     Dictionary_enqueueInternalWord(&dict, ">", (WORD_INTERNAL_t *) &Halogen_gt);
     Dictionary_enqueueInternalWord(&dict, "<", (WORD_INTERNAL_t *) &Halogen_lt);
     Dictionary_enqueueInternalWord(&dict, ">=", (WORD_INTERNAL_t *) &Halogen_lteq);
     Dictionary_enqueueInternalWord(&dict, "<=", (WORD_INTERNAL_t *) &Halogen_gteq);
+
+    Dictionary_enqueueInternalWord(&dict, "poke", (WORD_INTERNAL_t *) &Halogen_poke);
+    Dictionary_enqueueInternalWord(&dict, "peek", (WORD_INTERNAL_t *) &Halogen_peek);
 
     return dict;
 }
