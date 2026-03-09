@@ -14,6 +14,10 @@ int Tokenizer_iswhitespace(char c) {
     return 0;
 }
 
+int Tokenizer_isnumeric(char c) {
+    return (c >= '0' && c <= '9');
+}
+
 TOKEN_t *Tokenizer_talloc(size_t size) {
     TOKEN_t *token = malloc(size);
     if(token == NULL) return NULL; 
@@ -136,6 +140,11 @@ TOKEN_t *Tokenizer_parse(char *src) {
                     Tokenizer_enqueueGeneric(&toklist, TOKEN_COMMENT);
                 break;
                 
+                case '-':
+                    if(!Tokenizer_isnumeric(tokenBuffer[buf_idx - 1])) {
+                        Tokenizer_enqueueWord(&toklist, TOKEN_WORD, tokenBuffer);
+                        break;
+                    }
                 case '0':
                 case '1':
                 case '2':

@@ -5,9 +5,12 @@
 #include <tokenizer.h>
 #include <stack.h>
 
+#define POKEMEM_SIZE 65536
+
 typedef struct VM {
     STACK_t stack;
     STACK_t substack;
+    uint8_t pokemem[POKEMEM_SIZE];
 } VM_t;
 
 #include <dictionary.h>

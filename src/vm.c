@@ -9,6 +9,10 @@ int VM_Init(VM_t *vm) {
     if(Stack_Init(&vm->stack)) return 1;
     if(Stack_Init(&vm->substack)) return 1;
 
+    for(size_t i=0;i<POKEMEM_SIZE;i++) {
+        vm->pokemem[i] = 0;
+    }
+
     return 0;
 }
 
