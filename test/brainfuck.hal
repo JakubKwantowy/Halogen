@@ -4,10 +4,13 @@
 
 # Code goes here. #
 
-"++++++++ ++++++++ ++++++++ ++++++++ ++++++++ - . > . < ."
+"-,+[-[>>++++[>++++++++<-]<+<-[>+>+>-[>>>]<[[>+<-]>>+>]<<<<<-]]>>>[-]+>--[-[<->+++[-]]]<[++++++++++++<[>-[>+>>]>[+[<+>-]>+>>]<<<<<-]>>[<+>-]>[-[-<<[-]>>]<<[<<->>-]>>]<<[<<+>>-]]<[-]<.[-]<-,+]"
 
 0 0 poke
 1 1 poke
+
+2 0 poke
+3 0x10 poke
 
 :getbfptr
     0 peek
@@ -20,8 +23,23 @@
     8 swap >> 1 swap poke
 ;
 
+:getiptr
+    2 peek
+    3 peek
+    8 swap << |
+;
+
+:setiptr
+    dup 2 swap poke
+    8 swap >> 3 swap poke
+;
+
 :bf_print
     getbfptr peek putc
+;
+
+:bf_input
+    getbfptr getc poke
 ;
 
 :bf_add
@@ -44,14 +62,48 @@
     - setbfptr
 ;
 
-(
+:bf_loop
+    getbfptr peek bool ~ ( pop
+        4 1 poke
+        1 (
+            pop
+            getiptr 1 + dup setiptr
+            peek dup "[" = ( pop 4 peek 1 + 4 swap poke 0 ) pop
+            "]" = dup ( pop 4 peek 1 swap - 4 swap poke 0 ) pop
+            4 peek bool ~ & ~
+        )
+    0 ) pop
+;
+
+:bf_loopend
+    getbfptr peek bool ( pop
+        4 1 poke
+        1 (
+            pop
+            getiptr 1 swap - dup setiptr
+            peek dup "]" = ( pop 4 peek 1 + 4 swap poke 0 ) pop
+            "[" = dup ( pop 4 peek 1 swap - 4 swap poke 0 ) pop
+            4 peek bool ~ & ~
+        )
+    0 ) pop
+;
+
+( getiptr swap poke getiptr 1 + setiptr )
+
+2 0 poke
+3 0x10 poke
+
+getiptr peek (
     dup "." = ( pop bf_print 0 ) pop
+    dup "," = ( pop bf_input 0 ) pop
     dup "+" = ( pop bf_add 0 ) pop
     dup "-" = ( pop bf_sub 0 ) pop
     dup ">" = ( pop bf_next 0 ) pop
     dup "<" = ( pop bf_prev 0 ) pop
-
+    dup "[" = ( pop bf_loop 0 ) pop
+    dup "]" = ( pop bf_loopend 0 ) pop
     pop
-)
 
-10 putc
+    getiptr 1 + setiptr
+    getiptr peek
+)
