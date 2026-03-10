@@ -1,0 +1,13 @@
+# Halogen ROT13 #
+
+:rot13
+    13 +
+    26 swap %
+;
+
+1 (
+    getc 
+    dup dup "A" >= swap "Z" <= & ( pop "A" swap - rot13 "A" + 0 ) pop
+    dup dup "a" >= swap "z" <= & ( pop "a" swap - rot13 "a" + 0 ) pop
+    putc
+)

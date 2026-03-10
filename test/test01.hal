@@ -1,6 +1,7 @@
 # test file #
 
-10 10 -a
-print print print print
+input print
+getc pop
+getc print
 
 10 putc

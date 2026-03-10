@@ -47,6 +47,23 @@ int Halogen_swap(VM_t *vm) {
     return 0;
 }
 
+int Halogen_input(VM_t *vm) {
+    INT_t v;
+    scanf("%d", &v);
+    
+    Stack_Push(&vm->stack, v);
+
+    return 0;
+}
+
+int Halogen_getc(VM_t *vm) {
+    char c = getchar();
+    
+    Stack_Push(&vm->stack, (INT_t) c);
+
+    return 0;
+}
+
 int Halogen_add(VM_t *vm) {
     INT_t v1 = (INT_t) Stack_Pop(&vm->stack);
     INT_t v2 = (INT_t) Stack_Pop(&vm->stack);
@@ -229,6 +246,8 @@ WORD_t *createDefaultDict() {
     Dictionary_enqueueInternalWord(&dict, "dup", (WORD_INTERNAL_t *) &Halogen_dup);
     Dictionary_enqueueInternalWord(&dict, "pop", (WORD_INTERNAL_t *) &Halogen_pop);
     Dictionary_enqueueInternalWord(&dict, "swap", (WORD_INTERNAL_t *) &Halogen_swap);
+    Dictionary_enqueueInternalWord(&dict, "input", (WORD_INTERNAL_t *) &Halogen_input);
+    Dictionary_enqueueInternalWord(&dict, "getc", (WORD_INTERNAL_t *) &Halogen_getc);
 
     Dictionary_enqueueInternalWord(&dict, "+", (WORD_INTERNAL_t *) &Halogen_add);
     Dictionary_enqueueInternalWord(&dict, "-", (WORD_INTERNAL_t *) &Halogen_sub);
