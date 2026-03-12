@@ -1,37 +1,39 @@
 # Halogen brainfuck interpreter (yes it's real) #
 
+0 0x1000 0
+
 0
 
 # Code goes here. #
 
 "-,+[-[>>++++[>++++++++<-]<+<-[>+>+>-[>>>]<[[>+<-]>>+>]<<<<<-]]>>>[-]+>--[-[<->+++[-]]]<[++++++++++++<[>-[>+>>]>[+[<+>-]>+>>]<<<<<-]>>[<+>-]>[-[-<<[-]>>]<<[<<->>-]>>]<<[<<+>>-]]<[-]<.[-]<-,+]"
 
-0 0 poke
-1 1 poke
-
-2 0 poke
-3 0x10 poke
+:totoploc
+    2 + top -
+;
 
 :getbfptr
-    0 peek
-    1 peek
-    8 swap << |
+    0 totoploc grab
 ;
 
 :setbfptr
-    dup 0 swap poke
-    8 swap >> 1 swap poke
+    0xffff & 1 totoploc swap place
 ;
 
 :getiptr
-    2 peek
-    3 peek
-    8 swap << |
+    1 totoploc grab
 ;
 
 :setiptr
-    dup 2 swap poke
-    8 swap >> 3 swap poke
+    2 totoploc swap place
+;
+
+:gettmp
+    2 totoploc grab
+;
+
+:settmp
+    3 totoploc swap place
 ;
 
 :bf_print
@@ -64,34 +66,33 @@
 
 :bf_loop
     getbfptr peek bool ~ ( pop
-        4 1 poke
+        1 settmp
         1 (
             pop
             getiptr 1 + dup setiptr
-            peek dup "[" = ( pop 4 peek 1 + 4 swap poke 0 ) pop
-            "]" = dup ( pop 4 peek 1 swap - 4 swap poke 0 ) pop
-            4 peek bool ~ & ~
+            peek dup "[" = ( pop gettmp 1 + settmp 0 ) pop
+            "]" = dup ( pop gettmp 1 swap - settmp 0 ) pop
+            gettmp bool ~ & ~
         )
     0 ) pop
 ;
 
 :bf_loopend
     getbfptr peek bool ( pop
-        4 1 poke
+        1 settmp
         1 (
             pop
             getiptr 1 swap - dup setiptr
-            peek dup "]" = ( pop 4 peek 1 + 4 swap poke 0 ) pop
-            "[" = dup ( pop 4 peek 1 swap - 4 swap poke 0 ) pop
-            4 peek bool ~ & ~
+            peek dup "]" = ( pop gettmp 1 + settmp 0 ) pop
+            "[" = dup ( pop gettmp 1 swap - settmp 0 ) pop
+            gettmp bool ~ & ~
         )
     0 ) pop
 ;
 
 ( getiptr swap poke getiptr 1 + setiptr )
 
-2 0 poke
-3 0x10 poke
+0x1000 setiptr
 
 getiptr peek (
     dup "." = ( pop bf_print 0 ) pop
