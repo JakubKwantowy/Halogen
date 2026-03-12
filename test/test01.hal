@@ -1,7 +1,32 @@
 # test file #
 
-input print
-getc pop
-getc print
+:totoploc
+    top - 2 swap -
+;
+
+1 2 3 4 5 6
+top print
+
+32 putc
+
+1 grab print
+
+32 putc
+
+0 totoploc grab print
+
+10 putc
+
+1 10 place
+2 4 dswap
+
+top (
+    pop 
+
+    print
+    32 putc
+
+    top
+)
 
 10 putc

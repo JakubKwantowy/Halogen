@@ -10,7 +10,7 @@ static inline INT_t tobool(INT_t v) {
 
 int Halogen_print(VM_t *vm) {
     INT_t n = (INT_t) Stack_Pop(&vm->stack);
-    printf("%d ", n);
+    printf("%d", n);
 
     return 0;
 }
@@ -60,6 +60,86 @@ int Halogen_getc(VM_t *vm) {
     char c = getchar();
     
     Stack_Push(&vm->stack, (INT_t) c);
+
+    return 0;
+}
+
+int Halogen_top(VM_t *vm) {
+    Stack_Push(&vm->stack, (INT_t) vm->stack.top);
+
+    return 0;
+}
+
+int Halogen_grab(VM_t *vm) {
+    size_t v1 = Stack_Pop(&vm->stack);
+    size_t idx = vm->stack.top - v1 - 1;
+
+    if(idx < 0) {
+        VM_error("Bad stack index");
+        return 1;
+    }
+
+    if(idx >= vm->stack.top) {
+        VM_error("Bad stack index");
+        return 1;
+    }
+
+    Stack_Push(&vm->stack, (INT_t) vm->stack.stack[idx]);
+
+    return 0;
+}
+
+int Halogen_place(VM_t *vm) {
+    size_t v1 = Stack_Pop(&vm->stack);
+    size_t v2 = Stack_Pop(&vm->stack);
+    size_t idx = vm->stack.top - v2 - 1;
+
+    if(idx < 0) {
+        VM_error("Bad stack index");
+        printf("v1: %d, v2: %d\n", v1, v2);
+        return 1;
+    }
+
+    if(idx >= vm->stack.top) {
+        VM_error("Bad stack index");
+        printf("v1: %d, v2: %d\n, top: %d", v1, v2, vm->stack.top);
+        return 1;
+    }
+
+    vm->stack.stack[idx] = (size_t) v1;
+
+    return 0;
+}
+
+int Halogen_dswap(VM_t *vm) {
+    size_t v1 = Stack_Pop(&vm->stack);
+    size_t v2 = Stack_Pop(&vm->stack);
+    size_t i1 = vm->stack.top - v1 - 1;
+    size_t i2 = vm->stack.top - v2 - 1;
+
+    if(i1 < 0) {
+        VM_error("Bad stack index");
+        return 1;
+    }
+
+    if(i1 >= vm->stack.top) {
+        VM_error("Bad stack index");
+        return 1;
+    }
+
+    if(i2 < 0) {
+        VM_error("Bad stack index");
+        return 1;
+    }
+
+    if(i2 >= vm->stack.top) {
+        VM_error("Bad stack index");
+        return 1;
+    }
+
+    size_t temp = vm->stack.stack[i1];
+    vm->stack.stack[i1] = vm->stack.stack[i2];
+    vm->stack.stack[i2] = temp;
 
     return 0;
 }
@@ -248,6 +328,10 @@ WORD_t *createDefaultDict() {
     Dictionary_enqueueInternalWord(&dict, "swap", (WORD_INTERNAL_t *) &Halogen_swap);
     Dictionary_enqueueInternalWord(&dict, "input", (WORD_INTERNAL_t *) &Halogen_input);
     Dictionary_enqueueInternalWord(&dict, "getc", (WORD_INTERNAL_t *) &Halogen_getc);
+    Dictionary_enqueueInternalWord(&dict, "top", (WORD_INTERNAL_t *) &Halogen_top);
+    Dictionary_enqueueInternalWord(&dict, "grab", (WORD_INTERNAL_t *) &Halogen_grab);
+    Dictionary_enqueueInternalWord(&dict, "place", (WORD_INTERNAL_t *) &Halogen_place);
+    Dictionary_enqueueInternalWord(&dict, "dswap", (WORD_INTERNAL_t *) &Halogen_dswap);
 
     Dictionary_enqueueInternalWord(&dict, "+", (WORD_INTERNAL_t *) &Halogen_add);
     Dictionary_enqueueInternalWord(&dict, "-", (WORD_INTERNAL_t *) &Halogen_sub);
