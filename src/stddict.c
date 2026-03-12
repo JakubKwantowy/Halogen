@@ -96,13 +96,11 @@ int Halogen_place(VM_t *vm) {
 
     if(idx < 0) {
         VM_error("Bad stack index");
-        printf("v1: %d, v2: %d\n", v1, v2);
         return 1;
     }
 
     if(idx >= vm->stack.top) {
         VM_error("Bad stack index");
-        printf("v1: %d, v2: %d\n, top: %d", v1, v2, vm->stack.top);
         return 1;
     }
 
