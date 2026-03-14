@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <vm.h>
 #include <stack.h>
+#include <string.h>
 
 static inline INT_t tobool(INT_t v) {
     return (v ? ~0 : 0);
@@ -60,6 +61,19 @@ int Halogen_getc(VM_t *vm) {
     char c = getchar();
     
     Stack_Push(&vm->stack, (INT_t) c);
+
+    return 0;
+}
+
+int Halogen_gets(VM_t *vm) {
+    char buf[STDSTRLEN];
+
+    fgets(buf, STDSTRLEN - 1, stdin);
+    
+    size_t l = strlen(buf);
+    for(char *p = buf + l - 1; p >= buf; p--) {
+        Stack_Push(&vm->stack, *p);
+    }
 
     return 0;
 }
@@ -326,6 +340,7 @@ WORD_t *createDefaultDict() {
     Dictionary_enqueueInternalWord(&dict, "swap", (WORD_INTERNAL_t *) &Halogen_swap);
     Dictionary_enqueueInternalWord(&dict, "input", (WORD_INTERNAL_t *) &Halogen_input);
     Dictionary_enqueueInternalWord(&dict, "getc", (WORD_INTERNAL_t *) &Halogen_getc);
+    Dictionary_enqueueInternalWord(&dict, "gets", (WORD_INTERNAL_t *) &Halogen_gets);
     Dictionary_enqueueInternalWord(&dict, "top", (WORD_INTERNAL_t *) &Halogen_top);
     Dictionary_enqueueInternalWord(&dict, "grab", (WORD_INTERNAL_t *) &Halogen_grab);
     Dictionary_enqueueInternalWord(&dict, "place", (WORD_INTERNAL_t *) &Halogen_place);
