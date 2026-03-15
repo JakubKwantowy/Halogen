@@ -98,11 +98,21 @@ TOKEN_t *Tokenizer_parse(char *src) {
             if(*src_ptr == '"') {
                 buf_idx = 0;
                 src_ptr++;
+                while(*src_ptr == '"' && src_ptr[1] == '"') {
+                    tokenBuffer[buf_idx] = '"';
+                    buf_idx++;
+                    src_ptr += 2;
+                }
                 while(*src_ptr != '"') {
                     if(buf_idx == STDSTRLEN - 1) break;
                     tokenBuffer[buf_idx] = *src_ptr;
                     buf_idx++;
                     src_ptr++;
+                    while(*src_ptr == '"' && src_ptr[1] == '"') {
+                        tokenBuffer[buf_idx] = '"';
+                        buf_idx++;
+                        src_ptr += 2;
+                    }
                 }
                 src_ptr++;
                 strflag = 1;

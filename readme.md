@@ -49,8 +49,9 @@ Example: `10`, `0x3f`
 ### String ###
 
 A sequence of characters that gets pushed onto the stack with the first character on top. The start and end is marked by a double quote (`"`).
+To insert a `"` into a string, use `""`
 
-Example: `"User data should not be treated as code, even when sanitized"`
+Example: `"User data should not be treated as code, even when sanitized"`, `""" <- this will be a single quote"`
 
 ### Word redefinition ###
 
